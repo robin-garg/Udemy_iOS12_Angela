@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Quizzler-iOS12-master/Quizzler.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Xylophone-iOS12-master/Xylophone.xcodeproj">
    </FileRef>
    <FileRef
