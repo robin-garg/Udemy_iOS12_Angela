@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Classes and Objects/Classes and Objects.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Destini-iOS12-master/Destini.xcodeproj">
    </FileRef>
    <FileRef
