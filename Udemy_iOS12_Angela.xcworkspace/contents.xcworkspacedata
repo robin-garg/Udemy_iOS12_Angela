@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SwiftAccessLevels-master/SwiftAccessLevels.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:CalculatorApp/CalculatorApp.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Auto-Layout-Practice-iOS12-master/Auto Layout Practice.xcodeproj">
    </FileRef>
    <FileRef
