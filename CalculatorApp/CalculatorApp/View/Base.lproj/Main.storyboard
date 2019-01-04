@@ -290,7 +290,7 @@
                     </view>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
-                        <outlet property="lblValue" destination="UVD-sI-VfG" id="hdy-JB-ids"/>
+                        <outlet property="displayLabel" destination="UVD-sI-VfG" id="hdy-JB-ids"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
