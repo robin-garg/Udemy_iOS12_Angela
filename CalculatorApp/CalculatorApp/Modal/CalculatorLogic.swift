@@ -41,14 +41,14 @@ struct CalculatorLogic {
             let operation = intermediateCalculation?.operation {
             
             switch operation {
-            case "÷":
+            case "+":
                 return num1 + num2
             case "-":
                 return num1 - num2
             case "x":
                 return num1 * num2
-            case "/":
-                return num2 / num2
+            case "÷":
+                return num1 / num2
             default:
                 return nil
             }
