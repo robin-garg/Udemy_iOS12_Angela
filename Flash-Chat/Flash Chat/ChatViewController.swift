@@ -8,6 +8,8 @@
 
 import UIKit
 import Firebase
+import SVProgressHUD
+import ChameleonFramework
 
 class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDelegate {
     
@@ -42,9 +44,18 @@ class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDe
     //TODO: Declare cellForRowAtIndexPath here:
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
-        cell.messageBody.text = messageArray[indexPath.row].messageBody
-        cell.senderUsername.text = messageArray[indexPath.row].sender
+        let message = messageArray[indexPath.row]
+        cell.messageBody.text = message.messageBody
+        cell.senderUsername.text = message.sender
         cell.avatarImageView.image = UIImage(named: "egg")
+        
+        if message.sender != Auth.auth().currentUser?.email as String! {
+            cell.avatarImageView.backgroundColor = UIColor.flatLime()
+            cell.messageBackground.backgroundColor = UIColor.flatSand()
+        } else {
+            cell.avatarImageView.backgroundColor = UIColor.flatPurple()
+            cell.messageBackground.backgroundColor = UIColor.flatPowderBlue()
+        }
         return cell
     }
     
@@ -60,13 +71,13 @@ class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDe
         messageTextfield.endEditing(true)
     }
  
-    
     //TODO: Declare configureTableView here:
     func configureTableView() {
+        messageTableView.separatorStyle = .none
+        
         messageTableView.rowHeight = UITableView.automaticDimension
         messageTableView.estimatedRowHeight = 120
     }
-    
     
     ///////////////////////////////////////////
     
@@ -103,12 +114,12 @@ class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDe
         messageTextfield.isEnabled = false
         sendButton.isEnabled = false
         
+        SVProgressHUD.show()
         let messageDB = Database.database().reference().child("Messages")
-        
         let messageInfo = ["sender": Auth.auth().currentUser?.email,
                            "messageBody": messageTextfield.text!]
-        
         messageDB.childByAutoId().setValue(messageInfo) { (error, reference) in
+            SVProgressHUD.dismiss()
             if error != nil {
                 print(error!)
             } else {
@@ -122,8 +133,8 @@ class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDe
     
     //TODO: Create the retrieveMessages method here:
     func retrieveMessages() {
-        let messagesDB = Database.database().reference().child("Messages")
         
+        let messagesDB = Database.database().reference().child("Messages")
         messagesDB.observe(.childAdded) { (snapshot) in
             let snapshotValue = snapshot.value as! Dictionary<String, String>
             
@@ -140,8 +151,6 @@ class ChatViewController: UIViewController, UITableViewDataSource, UITextFieldDe
     }
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
-        
-        //TODO: Log out the user and send them back to WelcomeViewController
         do {
             try Auth.auth().signOut()
             navigationController?.popToRootViewController(animated: true)

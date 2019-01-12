@@ -20,7 +20,7 @@ class CustomMessageCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code goes here
         
-        
+        avatarImageView.layer.cornerRadius = 25.0
         
     }
 
