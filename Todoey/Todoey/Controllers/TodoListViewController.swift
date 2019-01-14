@@ -7,17 +7,20 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
     let itemsKey = "TodoListItemsKey"
     
-    let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("TodoList.plist")
-    
-    var itemArray = [TodoItem]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+    var itemArray = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         loadData()
     }
@@ -28,9 +31,13 @@ class TodoListViewController: UITableViewController {
             textField.placeholder = "Create new item"
         }
         let actionAdd = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            if let item = alert.textFields?[0].text {
-                self.itemArray.append(TodoItem(title: item))
+            if let itemText = alert.textFields?[0].text {
+                let item = Item(context: self.context)
+                item.title = itemText
+                
+                self.itemArray.append(item)
                 self.saveData()
+                
                 self.tableView.reloadData()
             }
         }
@@ -42,26 +49,21 @@ class TodoListViewController: UITableViewController {
     }
     
     func loadData() {
-        if let data = try? Data(contentsOf: filePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([TodoItem].self, from: data)
-            } catch {
-                print("No items saved!")
-            }
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error in fetching data \(error)")
         }
     }
     
     func saveData() {
-        let encoder = PropertyListEncoder()
-        
         do {
-            let data = try encoder.encode(self.itemArray)
-            try data.write(to: filePath!)
+            try context.save()
         } catch {
-            print("Error in saving data")
+            print("Error in saving data to database")
         }
-        
     }
 }
 
@@ -82,12 +84,17 @@ extension TodoListViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView .deselectRow(at: indexPath, animated: true)
         
         let item = itemArray[indexPath.row]
         item.completed = !item.completed
         saveData()
+        
         tableView.reloadData()
     }
 }
