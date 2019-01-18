@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var realm = try! Realm()
     
-    var arrCategories = [Category]()
+    var arrCategories: Results<Category>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,26 +20,23 @@ class CategoryViewController: UITableViewController {
         reloadData()
     }
     
-    func reloadData(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
-        do {
-            arrCategories = try context.fetch(request)
-        } catch {
-            print("Error while fetching categories")
-        }
+    func reloadData() {
+        arrCategories = realm.objects(Category.self)
         tableView.reloadData()
     }
     
     func saveCategory(_ categoryName: String) -> Void {
-        let category = Category(context: context)
+        let category = Category()
         category.name = categoryName
         
         do {
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         } catch {
-            print("Error while saving category")
+            print("Error while saving category: \(error)")
         }
         
-        arrCategories.append(category)
         tableView.reloadData()
     }
 
@@ -67,14 +64,14 @@ class CategoryViewController: UITableViewController {
     // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return arrCategories.count
+        return arrCategories?.count ?? 1
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
 
         // Configure the cell...
-        cell.textLabel?.text = arrCategories[indexPath.row].name
+        cell.textLabel?.text = arrCategories?[indexPath.row].name ?? "No Categories found"
         
         return cell
     }
@@ -88,7 +85,7 @@ class CategoryViewController: UITableViewController {
         let todoListController = segue.destination as! TodoListViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            todoListController.selectedCateogry = arrCategories[indexPath.row]
+            todoListController.selectedCateogry = arrCategories?[indexPath.row]
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
