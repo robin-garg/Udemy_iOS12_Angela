@@ -12,5 +12,7 @@ import RealmSwift
 class Item: Object {
     @objc dynamic var title: String = ""
     @objc dynamic var completed: Bool = false
+    @objc dynamic var createdAt: Date = Date()
+    
     var category = LinkingObjects(fromType: Category.self, property: "items")
 }
