@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeableTableViewController {
     let itemsKey = "TodoListItemsKey"
     
     let realm = try! Realm()
@@ -59,10 +59,21 @@ class TodoListViewController: UITableViewController {
     }
     
     func reloadData() {
-
         itemArray = selectedCateogry?.items.sorted(byKeyPath: "createdAt", ascending: true)
 
         tableView.reloadData()
+    }
+    
+    override func delete(at indexPath: IndexPath) {
+        if let item = itemArray?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(item)
+                }
+            } catch {
+                print("Error updating item")
+            }
+        }
     }
 }
 
@@ -72,7 +83,7 @@ extension TodoListViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoListItem", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         cell.accessoryType = .none
         
         if let item = itemArray?[indexPath.row] {

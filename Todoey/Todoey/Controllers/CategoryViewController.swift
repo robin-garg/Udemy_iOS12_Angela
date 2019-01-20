@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeableTableViewController {
     var realm = try! Realm()
     
     var arrCategories: Results<Category>?
@@ -38,6 +38,18 @@ class CategoryViewController: UITableViewController {
         }
         
         tableView.reloadData()
+    }
+    
+    override func delete(at indexPath: IndexPath) {
+        if let item = self.arrCategories?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(item)
+                }
+            } catch {
+                print("Error deleting object: \(error)")
+            }
+        }
     }
 
     @IBAction func onTapAddCategory(_ sender: UIBarButtonItem) {
@@ -68,8 +80,8 @@ class CategoryViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        
         // Configure the cell...
         cell.textLabel?.text = arrCategories?[indexPath.row].name ?? "No Categories found"
         
